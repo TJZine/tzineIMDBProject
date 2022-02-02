@@ -10,4 +10,3 @@ def get_show_test():
     show_response = get_user_data('tt8420184')
     response_content = show_response.json()
     assert response_content["rank"] == "16"
-
