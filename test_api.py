@@ -1,4 +1,5 @@
-# input show
+import requests
+import secrets
 
 def get_user_data(movie_id):
     return requests.get('https://imdb-api.com/en/API/UserRatings/' + secrets.api_key + '/' + movie_id)
