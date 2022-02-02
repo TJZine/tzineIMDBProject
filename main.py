@@ -30,6 +30,3 @@ if __name__ == '__main__':
     print(rank200_rated_show.text)
     wheel_of_time_rating = get_user_data('tt7462410')
     print(wheel_of_time_rating.text)
-
-# https://alexwlchan.net/2017/10/requests-hooks/
-# https://docs.python-requests.org/en/latest/user/advanced/#advanced
