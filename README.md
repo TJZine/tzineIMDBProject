@@ -2,7 +2,8 @@
 Project 1 Sprint 1
 1. Tristan Zine
 2. Requirements.txt contains the packages needed to run the program. Specifically the requests module.
-3. The project connects to the IMDb API, first to retrieve the list of the top 250 TV shows. 
+Also need to create file titled "secrets.py" with a variable inside named "api_key" with your own api key as value.
+4. The project connects to the IMDb API, first to retrieve the list of the top 250 TV shows. 
 Second to retrieve the 5 specific shows User ratings listed in the project specifications. 
 It then writes the list of shows and user ratings to a text file, each with their own line.
 4. The only thing missing from the project at the moment in working with pytest on github.
