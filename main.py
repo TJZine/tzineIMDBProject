@@ -16,7 +16,7 @@ def write_to_file(top_shows_list):
 
 
 if __name__ == '__main__':
-    eraseFile = open("output/shows.txt", "w") # erases any previous text in the file
+    eraseFile = open("output/shows.txt", "w")  # erases any previous text in the file
     eraseFile.close()
 
     imdb_API = api_connect()
@@ -45,4 +45,4 @@ if __name__ == '__main__':
     print(value_list[0])
     for n in value_list:
         print(n)
-        write_to_file(n+ "\n")
+        write_to_file(n + "\n")
