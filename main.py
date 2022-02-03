@@ -2,11 +2,11 @@ import requests
 import secrets
 
 
-def api_connect(): #connects to the IMDB top 250TV shows api
+def api_connect():  # connects to the IMDB top 250TV shows api
     return requests.get('https://imdb-api.com/API/Top250TVs/' + secrets.api_key)
 
 
-def get_user_data(movie_id):  #takes imdbID and returns user rating data
+def get_user_data(movie_id):  # takes imdbID and returns user rating data
     return requests.get('https://imdb-api.com/en/API/UserRatings/' + secrets.api_key + '/' + movie_id)
 
 
