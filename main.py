@@ -1,6 +1,7 @@
 import requests
 import secrets
-
+import sqlite3
+from typing import Tuple
 
 def api_connect():  # connects to the IMDB top 250TV shows api
     return requests.get('https://imdb-api.com/API/Top250TVs/' + secrets.api_key)
@@ -15,6 +16,82 @@ def write_to_file(top_shows_list):
         writeFile.write(top_shows_list)  # open shows.txt to write to file
 
 
+def open_db(filename:str)->Tuple[sqlite3.Connection, sqlite3.Cursor]:
+    db_connection = sqlite3.connect(filename)
+    cursor = db_connection.cursor()
+    return db_connection, cursor
+
+
+def close_db(connection:sqlite3.Connection):
+    connection.commit()
+    connection.close()
+
+
+def test_db():
+    connection, cursor = open_db('demo_db.sqlite')
+    print(type(connection))
+    close_db(connection)
+
+
+def setup_db(cursor:sqlite3.Cursor):
+    cursor.execute('''CREATE TABLE IF NOT EXISTS top_250_tv_shows(
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    full_title TEXT NOT NULL,
+    year TEXT NOT NULL,
+    crew TEXT NOT NULL,
+    imdb_rating REAL DEFAULT 0,
+    imdb_rating_count INTEGER DEFAULT 0
+    );''')
+    cursor.execute('''CREATE TABLE IF NOT EXISTS user_ratings(
+    imdb_id TEXT PRIMARY KEY,
+    total_rating INTEGER DEFAULT 0,
+    total_rating_votes INTEGER DEFAULT 0,
+    ten_rating_percent REAL DEFAULT 0,
+    ten_rating_votes INTEGER DEFAULT 0,
+    nine_rating_percent REAL DEFAULT 0,
+    nine_rating_votes INTEGER DEFAULT 0,
+    eight_rating_percent REAL DEFAULT 0,
+    eight_rating_votes INTEGER DEFAULT 0,
+    seven_rating_percent REAL DEFAULT 0,
+    seven_rating_votes INTEGER DEFAULT 0,
+    six_rating_percent REAL DEFAULT 0,
+    six_rating_votes INTEGER DEFAULT 0,
+    five_rating_percent REAL DEFAULT 0,
+    five_rating_votes INTEGER DEFAULT 0,
+    four_rating_percent REAL DEFAULT 0,
+    four_rating_votes INTEGER DEFAULT 0,
+    three_rating_percent REAL DEFAULT 0,
+    three_rating_votes INTEGER DEFAULT 0,
+    two_rating_percent REAL DEFAULT 0,
+    two_rating_votes INTEGER DEFAULT 0,
+    one_rating_percent REAL DEFAULT 0,
+    one_rating_votes INTEGER DEFAULT 0,
+    FOREIGN KEY (imdb_id) REFERENCES top_250_tv_shows (id)
+    ON DELETE CASCADE ON UPDATE NO ACTION
+    );''')
+
+
+def tv_list(text):
+    show_list = text_value.split('},{')
+    show_list[0] = show_list[0][11:]
+    curr_show = show_list[0].split(',')
+    curr_show[0] = curr_show[0].split(':')
+    curr_show[0] = curr_show[0][1]
+    print(curr_show[0][1:len(curr_show[0]) - 1])
+    for x in range(len(show_list)):
+        print(x)
+        curr_show = show_list[x].split(',')
+        for y in range(len(curr_show)-1):
+            print(y)
+            curr_show[y] = curr_show[y].split(':')
+            curr_show[y] = curr_show[y][1]
+        print(type(curr_show[x]))
+        print(curr_show[x])
+        #  write_to_file(show_list[x] + "\n")
+
+#  def add_top_250(cursor:sqlite3.Cursor):
+
 if __name__ == '__main__':
     eraseFile = open("output/shows.txt", "w")  # erases any previous text in the file
     eraseFile.close()
@@ -26,25 +103,24 @@ if __name__ == '__main__':
     write_to_file("User Ratings:" + "\n")
     rank1_rated_show = get_user_data('tt5491994')
     write_to_file(str(rank1_rated_show.json()) + "\n")  # convert dictionary entry to string to write to shows.txt
-    print(rank1_rated_show.json())
     rank50_rated_show = get_user_data('tt2297757')
     write_to_file(str(rank50_rated_show.json()) + "\n")
-    print(rank50_rated_show.json())
     rank100_rated_show = get_user_data('tt0286486')
     write_to_file(str(rank100_rated_show.json()) + "\n")
-    print(rank100_rated_show.json())
     rank200_rated_show = get_user_data('tt1492966')
     write_to_file(str(rank200_rated_show.json()) + "\n")
-    print(rank200_rated_show.json())
     wheel_of_time_rating = get_user_data('tt7462410')
     write_to_file(str(wheel_of_time_rating.json()) + "\n")
-    print(wheel_of_time_rating.json())
+
 
     # writing top 250 shows to console and shows.txt
     write_to_file("Top 250 Shows:" + "\n")
     text_value = imdb_API.text
+    # tv_list(text_value)
     value_list = text_value.split('},{')
     value_list[0] = value_list[0][11:]
     for n in value_list:
-        print(n)
         write_to_file(n + "\n")
+    conn, cur = open_db('imdb_db.sqlite')
+    setup_db(cur)
+    close_db(conn)
