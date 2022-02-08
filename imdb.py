@@ -17,7 +17,7 @@ def write_to_file(top_shows_list):
         writeFile.write(top_shows_list)  # open shows.txt to write to file
 
 
-def open_db(filename: str)->Tuple[sqlite3.Connection, sqlite3.Cursor]:
+def open_db(filename: str) -> Tuple[sqlite3.Connection, sqlite3.Cursor]:
     db_connection = sqlite3.connect(filename)
     cursor = db_connection.cursor()
     return db_connection, cursor
