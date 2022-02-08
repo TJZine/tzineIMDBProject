@@ -16,13 +16,13 @@ def write_to_file(top_shows_list):
         writeFile.write(top_shows_list)  # open shows.txt to write to file
 
 
-def open_db(filename:str)->Tuple[sqlite3.Connection, sqlite3.Cursor]:
+def open_db(filename: str)->Tuple[sqlite3.Connection, sqlite3.Cursor]:
     db_connection = sqlite3.connect(filename)
     cursor = db_connection.cursor()
     return db_connection, cursor
 
 
-def close_db(connection:sqlite3.Connection):
+def close_db(connection: sqlite3.Connection):
     connection.commit()
     connection.close()
 
@@ -33,7 +33,7 @@ def test_db():
     close_db(connection)
 
 
-def setup_db(cursor:sqlite3.Cursor):
+def setup_db(cursor: sqlite3.Cursor):
     cursor.execute('''CREATE TABLE IF NOT EXISTS top_250_tv_shows(
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
@@ -72,26 +72,6 @@ def setup_db(cursor:sqlite3.Cursor):
     );''')
 
 
-def tv_list(text):
-    show_list = text_value.split('},{')
-    show_list[0] = show_list[0][11:]
-    curr_show = show_list[0].split(',')
-    curr_show[0] = curr_show[0].split(':')
-    curr_show[0] = curr_show[0][1]
-    print(curr_show[0][1:len(curr_show[0]) - 1])
-    for x in range(len(show_list)):
-        print(x)
-        curr_show = show_list[x].split(',')
-        for y in range(len(curr_show)-1):
-            print(y)
-            curr_show[y] = curr_show[y].split(':')
-            curr_show[y] = curr_show[y][1]
-        print(type(curr_show[x]))
-        print(curr_show[x])
-        #  write_to_file(show_list[x] + "\n")
-
-#  def add_top_250(cursor:sqlite3.Cursor):
-
 if __name__ == '__main__':
     eraseFile = open("output/shows.txt", "w")  # erases any previous text in the file
     eraseFile.close()
@@ -116,7 +96,6 @@ if __name__ == '__main__':
     # writing top 250 shows to console and shows.txt
     write_to_file("Top 250 Shows:" + "\n")
     text_value = imdb_API.text
-    # tv_list(text_value)
     value_list = text_value.split('},{')
     value_list[0] = value_list[0][11:]
     for n in value_list:
@@ -124,4 +103,3 @@ if __name__ == '__main__':
     conn, cur = open_db('imdb_db.sqlite')
     setup_db(cur)
     close_db(conn)
-    

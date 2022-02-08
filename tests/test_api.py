@@ -2,6 +2,7 @@ import requests
 import secrets
 import imdbDB
 
+
 def test_connect(movie_id):
     return requests.get('https://imdb-api.com/en/API/UserRatings/' + secrets.api_key + '/' + movie_id)
 

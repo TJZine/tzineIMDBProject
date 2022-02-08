@@ -4,6 +4,7 @@ import secrets
 import sqlite3
 from typing import Tuple
 
+
 def get_top_250_data() -> list[dict]:
     api_query = f"https://imdb-api.com/en/API/Top250TVs/{secrets.secret_key}"
     response = requests.get(api_query)
@@ -48,18 +49,18 @@ def get_ratings(top_show_data: list[dict]) -> list[dict]:
     return results
 
 
-def open_db(filename:str)->Tuple[sqlite3.Connection, sqlite3.Cursor]:
+def open_db(filename: str)->Tuple[sqlite3.Connection, sqlite3.Cursor]:
     db_connection = sqlite3.connect(filename)
     cursor = db_connection.cursor()
     return db_connection, cursor
 
 
-def close_db(connection:sqlite3.Connection):
+def close_db(connection: sqlite3.Connection):
     connection.commit()
     connection.close()
 
 
-def setup_db(cursor:sqlite3.Cursor):
+def setup_db(cursor: sqlite3.Cursor):
     cursor.execute('''CREATE TABLE IF NOT EXISTS top_250_tv_shows(
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
@@ -98,7 +99,6 @@ def setup_db(cursor:sqlite3.Cursor):
     );''')
 
 
-
 def main():
     top_show_data = get_top_250_data()
     ratings_data = get_ratings(top_show_data)
@@ -111,4 +111,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-    
