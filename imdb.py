@@ -124,3 +124,4 @@ if __name__ == '__main__':
     conn, cur = open_db('imdb_db.sqlite')
     setup_db(cur)
     close_db(conn)
+    
