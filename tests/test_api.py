@@ -1,6 +1,5 @@
 import requests
 import secrets
-import imdbDB
 
 
 def test_connect(movie_id):

@@ -3,6 +3,7 @@ import secrets
 import sqlite3
 from typing import Tuple
 
+
 def api_connect():  # connects to the IMDB top 250TV shows api
     return requests.get('https://imdb-api.com/API/Top250TVs/' + secrets.api_key)
 
@@ -91,7 +92,6 @@ if __name__ == '__main__':
     write_to_file(str(rank200_rated_show.json()) + "\n")
     wheel_of_time_rating = get_user_data('tt7462410')
     write_to_file(str(wheel_of_time_rating.json()) + "\n")
-
 
     # writing top 250 shows to console and shows.txt
     write_to_file("Top 250 Shows:" + "\n")
