@@ -11,7 +11,7 @@ def get_top_250_data() -> list[dict]:
     if response.status_code != 200:  # if we don't get an ok response we have trouble
         print(f"Failed to get data, response code:{response.status_code} and error message: {response.reason} ")
         sys.exit(-1)
-    # json_response is a kinda useless dictionary, but the items element has what we need
+    # json_response is a kinda useless dictionary, but the item's element has what we need
     json_response = response.json()
     show_list = json_response["items"]
     return show_list
@@ -60,6 +60,15 @@ def close_db(connection: sqlite3.Connection):
     connection.close()
 
 
+#  test execute many version if time before due date
+def top_250_to_db(cursor: sqlite3.Cursor, show_dict):
+    for entry in show_dict:
+        cursor.execute(f'''INSERT INTO TOP_250_TV_SHOWS (id, title, full_title, year, crew, imdb_rating, 
+                                    imdb_rating_count) VALUES (?,?,?,?,?,?,?);''',
+                       (entry['id'], entry['title'], entry['fullTitle'],
+                        entry['year'], entry['crew'], entry['imDbRating'], entry['imDbRatingCount']))
+
+
 def setup_db(cursor: sqlite3.Cursor):
     cursor.execute('''CREATE TABLE IF NOT EXISTS top_250_tv_shows(
     id TEXT PRIMARY KEY,
@@ -106,6 +115,7 @@ def main():
     report_results(top_show_data)
     conn, cur = open_db('output/imdb_db.sqlite')
     setup_db(cur)
+    top_250_to_db(cur, top_show_data)
     close_db(conn)
 
 
