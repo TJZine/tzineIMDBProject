@@ -63,10 +63,28 @@ def close_db(connection: sqlite3.Connection):
 #  test execute many version if time before due date
 def top_250_to_db(cursor: sqlite3.Cursor, show_dict):
     for entry in show_dict:
-        cursor.execute('''INSERT INTO TOP_250_TV_SHOWS (id, title, full_title, year, crew, imdb_rating, 
+        cursor.execute('''INSERT INTO TOP_250_TV_SHOWS (id, title, full_title, year, crew, imdb_rating,
                                     imdb_rating_count) VALUES (?,?,?,?,?,?,?);''',
                        (entry['id'], entry['title'], entry['fullTitle'],
                         entry['year'], entry['crew'], entry['imDbRating'], entry['imDbRatingCount']))
+
+
+def user_ratings_to_db(cursor: sqlite3.Cursor, ratings_dict):
+    for entry in ratings_dict:
+        cursor.execute('''INSERT INTO USER_RATINGS (imdb_id, total_rating, total_rating_votes, ten_rating_percent,
+         ten_rating_votes, nine_rating_percent, nine_rating_votes, eight_rating_percent, eight_rating_votes,
+         seven_rating_percent, seven_rating_votes, six_rating_percent, six_rating_votes, five_rating_percent,
+         five_rating_votes, four_rating_percent, four_rating_votes, three_rating_percent, three_rating_votes,
+         two_rating_percent, two_rating_votes, one_rating_percent, one_rating_votes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,
+         ?,?,?,?,?,?,?,?,?,?);''',
+                       (entry['imDbId'], entry['totalRating'], entry['totalRatingVotes'],
+                        entry['ratings'][0]['percent'], entry['ratings'][0]['votes'], entry['ratings'][1]['percent'],
+                        entry['ratings'][1]['votes'], entry['ratings'][2]['percent'], entry['ratings'][2]['votes'],
+                        entry['ratings'][3]['percent'], entry['ratings'][3]['votes'], entry['ratings'][4]['percent'],
+                        entry['ratings'][4]['votes'], entry['ratings'][5]['percent'], entry['ratings'][5]['votes'],
+                        entry['ratings'][6]['percent'], entry['ratings'][6]['votes'], entry['ratings'][7]['percent'],
+                        entry['ratings'][7]['votes'], entry['ratings'][8]['percent'], entry['ratings'][8]['votes'],
+                        entry['ratings'][9]['percent'], entry['ratings'][9]['votes']))
 
 
 def setup_db(cursor: sqlite3.Cursor):
@@ -111,12 +129,29 @@ def setup_db(cursor: sqlite3.Cursor):
 def main():
     top_show_data = get_top_250_data()
     ratings_data = get_ratings(top_show_data)
+    print(ratings_data[0]['ratings'][0])
+    print(ratings_data[0]['ratings'][0]['percent'])
+    print(ratings_data[0]['ratings'][0]['votes'])
+    print(ratings_data[0]['imDbId'])
+    print(ratings_data[0]['ratings'][1])
+    print(ratings_data[0]['ratings'][1]['percent'])
+    print(ratings_data[0]['ratings'][1]['votes'])
+    print(ratings_data[0]['ratings'][9])
+    print(ratings_data[0]['ratings'][9]['percent'])
+    print(ratings_data[0]['ratings'][9]['votes'])
     report_results(ratings_data)
     report_results(top_show_data)
     conn, cur = open_db('output/imdb_db.sqlite')
     cur.execute('DELETE FROM TOP_250_TV_SHOWS')
+    cur.execute('DELETE FROM USER_RATINGS')
     setup_db(cur)
     top_250_to_db(cur, top_show_data)
+    entry = ratings_data[0]
+    print(len(ratings_data))
+    for entry in ratings_data:
+        print(entry)
+#  adding user ratings to table works for entry 1 of ratings_data need to see why list index error occuring
+#    user_ratings_to_db(cur, ratings_data)
     close_db(conn)
 
 
