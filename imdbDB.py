@@ -63,7 +63,7 @@ def close_db(connection: sqlite3.Connection):
 #  test execute many version if time before due date
 def top_250_to_db(cursor: sqlite3.Cursor, show_dict):
     for entry in show_dict:
-        cursor.execute(f'''INSERT INTO TOP_250_TV_SHOWS (id, title, full_title, year, crew, imdb_rating, 
+        cursor.execute('''INSERT INTO TOP_250_TV_SHOWS (id, title, full_title, year, crew, imdb_rating, 
                                     imdb_rating_count) VALUES (?,?,?,?,?,?,?);''',
                        (entry['id'], entry['title'], entry['fullTitle'],
                         entry['year'], entry['crew'], entry['imDbRating'], entry['imDbRatingCount']))
@@ -114,6 +114,7 @@ def main():
     report_results(ratings_data)
     report_results(top_show_data)
     conn, cur = open_db('output/imdb_db.sqlite')
+    cur.execute('DELETE FROM TOP_250_TV_SHOWS')
     setup_db(cur)
     top_250_to_db(cur, top_show_data)
     close_db(conn)
