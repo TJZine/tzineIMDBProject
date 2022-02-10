@@ -38,6 +38,7 @@ def get_ratings(top_show_data: list[dict]) -> list[dict]:
     hundred_query = f"{base_query}{top_show_data[99]['id']}"
     api_queries.append(hundred_query)
     two_hundred = f"{base_query}{top_show_data[199]['id']}"
+#   two_hundred = f"{base_query}{top_show_data[198]['id']}"
     api_queries.append(two_hundred)
     for query in api_queries:
         response = requests.get(query)
@@ -71,20 +72,34 @@ def top_250_to_db(cursor: sqlite3.Cursor, show_dict):
 
 def user_ratings_to_db(cursor: sqlite3.Cursor, ratings_dict):
     for entry in ratings_dict:
-        cursor.execute('''INSERT INTO USER_RATINGS (imdb_id, total_rating, total_rating_votes, ten_rating_percent,
-         ten_rating_votes, nine_rating_percent, nine_rating_votes, eight_rating_percent, eight_rating_votes,
-         seven_rating_percent, seven_rating_votes, six_rating_percent, six_rating_votes, five_rating_percent,
-         five_rating_votes, four_rating_percent, four_rating_votes, three_rating_percent, three_rating_votes,
-         two_rating_percent, two_rating_votes, one_rating_percent, one_rating_votes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,
-         ?,?,?,?,?,?,?,?,?,?);''',
-                       (entry['imDbId'], entry['totalRating'], entry['totalRatingVotes'],
-                        entry['ratings'][0]['percent'], entry['ratings'][0]['votes'], entry['ratings'][1]['percent'],
-                        entry['ratings'][1]['votes'], entry['ratings'][2]['percent'], entry['ratings'][2]['votes'],
-                        entry['ratings'][3]['percent'], entry['ratings'][3]['votes'], entry['ratings'][4]['percent'],
-                        entry['ratings'][4]['votes'], entry['ratings'][5]['percent'], entry['ratings'][5]['votes'],
-                        entry['ratings'][6]['percent'], entry['ratings'][6]['votes'], entry['ratings'][7]['percent'],
-                        entry['ratings'][7]['votes'], entry['ratings'][8]['percent'], entry['ratings'][8]['votes'],
-                        entry['ratings'][9]['percent'], entry['ratings'][9]['votes']))
+        if not entry['ratings']:
+            cursor.execute('''INSERT INTO USER_RATINGS (imdb_id, total_rating, total_rating_votes, ten_rating_percent,
+                         ten_rating_votes, nine_rating_percent, nine_rating_votes, eight_rating_percent,
+                         eight_rating_votes, seven_rating_percent, seven_rating_votes, six_rating_percent,
+                         six_rating_votes, five_rating_percent, five_rating_votes, four_rating_percent,
+                         four_rating_votes, three_rating_percent, three_rating_votes, two_rating_percent,
+                         two_rating_votes, one_rating_percent, one_rating_votes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,
+                         ?,?,?,?,?,?,?,?,?,?);''',
+                           (entry['imDbId'], entry['totalRating'], entry['totalRatingVotes'], 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+        else:
+            cursor.execute('''INSERT INTO USER_RATINGS (imdb_id, total_rating, total_rating_votes, ten_rating_percent,
+             ten_rating_votes, nine_rating_percent, nine_rating_votes, eight_rating_percent, eight_rating_votes,
+             seven_rating_percent, seven_rating_votes, six_rating_percent, six_rating_votes, five_rating_percent,
+             five_rating_votes, four_rating_percent, four_rating_votes, three_rating_percent, three_rating_votes,
+             two_rating_percent, two_rating_votes, one_rating_percent, one_rating_votes) VALUES (?, ?, ?, ?, ?, ?, ?, ?,
+             ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);''',
+                           (entry['imDbId'], entry['totalRating'], entry['totalRatingVotes'],
+                            entry['ratings'][0]['percent'], entry['ratings'][0]['votes'],
+                            entry['ratings'][1]['percent'], entry['ratings'][1]['votes'],
+                            entry['ratings'][2]['percent'], entry['ratings'][2]['votes'],
+                            entry['ratings'][3]['percent'], entry['ratings'][3]['votes'],
+                            entry['ratings'][4]['percent'], entry['ratings'][4]['votes'],
+                            entry['ratings'][5]['percent'], entry['ratings'][5]['votes'],
+                            entry['ratings'][6]['percent'], entry['ratings'][6]['votes'],
+                            entry['ratings'][7]['percent'], entry['ratings'][7]['votes'],
+                            entry['ratings'][8]['percent'], entry['ratings'][8]['votes'],
+                            entry['ratings'][9]['percent'], entry['ratings'][9]['votes']))
 
 
 def setup_db(cursor: sqlite3.Cursor):
@@ -127,18 +142,10 @@ def setup_db(cursor: sqlite3.Cursor):
 
 
 def main():
+    erase_file = open("output/Output.txt", "w")  # erases any previous text in the file
+    erase_file.close()
     top_show_data = get_top_250_data()
     ratings_data = get_ratings(top_show_data)
-    print(ratings_data[0]['ratings'][0])
-    print(ratings_data[0]['ratings'][0]['percent'])
-    print(ratings_data[0]['ratings'][0]['votes'])
-    print(ratings_data[0]['imDbId'])
-    print(ratings_data[0]['ratings'][1])
-    print(ratings_data[0]['ratings'][1]['percent'])
-    print(ratings_data[0]['ratings'][1]['votes'])
-    print(ratings_data[0]['ratings'][9])
-    print(ratings_data[0]['ratings'][9]['percent'])
-    print(ratings_data[0]['ratings'][9]['votes'])
     report_results(ratings_data)
     report_results(top_show_data)
     conn, cur = open_db('output/imdb_db.sqlite')
@@ -146,12 +153,12 @@ def main():
     cur.execute('DELETE FROM USER_RATINGS')
     setup_db(cur)
     top_250_to_db(cur, top_show_data)
-    entry = ratings_data[0]
     print(len(ratings_data))
     for entry in ratings_data:
         print(entry)
-#  adding user ratings to table works for entry 1 of ratings_data need to see why list index error occuring
-#    user_ratings_to_db(cur, ratings_data)
+#  adding user ratings to table works for entry 1 of ratings_data need to see why list index error occurring
+    user_ratings_to_db(cur, ratings_data)
+    conn.commit()
     close_db(conn)
 
 

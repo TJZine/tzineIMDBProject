@@ -74,7 +74,7 @@ def setup_db(cursor: sqlite3.Cursor):
 
 
 if __name__ == '__main__':
-    eraseFile = open("output/shows.txt", "w")  # erases any previous text in the file
+    eraseFile = open("output/Output.txt", "w")  # erases any previous text in the file
     eraseFile.close()
 
     imdb_API = api_connect()  # connect to imdb API
