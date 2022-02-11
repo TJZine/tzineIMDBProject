@@ -2,6 +2,7 @@ import sqlite3
 import imdbDB
 
 
+#  tests retrieval of top 250 tv shows data, tests length of the returned result is 250.
 def test_top_250_tv():
     result = imdbDB.get_top_250_data()
     assert len(result) == 250
@@ -19,6 +20,7 @@ def dict_test() -> list[dict]:
     return show_test_dict
 
 
+#  creates new database db_test and tests setup database and top_250_tv_db methods from imdbDB.py.
 def test_db():
     entry = dict_test()
     conn = sqlite3.connect('db_test.sqlite')

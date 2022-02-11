@@ -60,7 +60,7 @@ def close_db(connection: sqlite3.Connection):
     connection.close()
 
 
-#  test execute many version if time before due date
+#  loop that writes the top 250 shows to the database specified.
 def top_250_to_db(cursor: sqlite3.Cursor, show_dict, name):
     for entry in show_dict:
         cursor.execute(f'''INSERT INTO {name} (id, title, full_title, year, crew, imdb_rating,
@@ -69,6 +69,7 @@ def top_250_to_db(cursor: sqlite3.Cursor, show_dict, name):
                         entry['year'], entry['crew'], entry['imDbRating'], entry['imDbRatingCount']))
 
 
+#  filter that takes a list of values. used to avoid repeat code in user_ratings_to_db function.
 def user_ratings_filter(cursor: sqlite3.Cursor, val_list):
     cursor.execute('''INSERT INTO USER_RATINGS (imdb_id, total_rating, total_rating_votes, ten_rating_percent,
                              ten_rating_votes, nine_rating_percent, nine_rating_votes, eight_rating_percent,
@@ -79,6 +80,7 @@ def user_ratings_filter(cursor: sqlite3.Cursor, val_list):
                              ?,?,?,?,?,?,?,?,?,?);''', val_list)
 
 
+#  writes user ratings data to database, if there are no entries for ratings replace with 0's.
 def user_ratings_to_db(cursor: sqlite3.Cursor, ratings_dict):
     for entry in ratings_dict:
         if not entry['ratings']:
@@ -100,6 +102,7 @@ def user_ratings_to_db(cursor: sqlite3.Cursor, ratings_dict):
                                  entry['ratings'][9]['percent'], entry['ratings'][9]['votes']))
 
 
+#  creates the table in the database for the top 250 shows with the name specified.
 def setup_top_250_tv_db(cursor: sqlite3.Cursor, name):
     cursor.execute(f'''CREATE TABLE IF NOT EXISTS {name}(
     id TEXT PRIMARY KEY,
@@ -112,6 +115,7 @@ def setup_top_250_tv_db(cursor: sqlite3.Cursor, name):
     );''')
 
 
+#  creates table in database for user ratings data.
 def setup_user_ratings_db(cursor: sqlite3.Cursor):
     cursor.execute('''CREATE TABLE IF NOT EXISTS user_ratings(
     imdb_id TEXT PRIMARY KEY,
@@ -142,6 +146,7 @@ def setup_user_ratings_db(cursor: sqlite3.Cursor):
     );''')
 
 
+#  clears any current tables in the database to avoid unique key errors.
 def clear_db(cursor: sqlite3.Cursor):
     cursor.execute("DROP TABLE IF EXISTS TOP_250_TV_SHOWS")
     cursor.execute("DROP TABLE IF EXISTS USER_RATINGS")
