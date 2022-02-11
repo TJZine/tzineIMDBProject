@@ -15,8 +15,4 @@ the 5 shows we retrieved user rating information for. The first table has the fo
 The second has columns for id, total rating, total rating votes and each rating 1-10 with both 
 percentage of the total votes and vote
 count for each rating.
-5. I don't believe there is anything missing from the project at the moment. The only thing im not 100% sure
-about is the requirements.txt as its throwing errors related the package not existing.
-I know the packages are working though as the files still run fine. I am also not sure 
-if im allowed to use from imports in requirements and having "Tuple" or if im meant to have "typing"
-or both.
+5. I don't believe there is anything missing from the project at the moment.
