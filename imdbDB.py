@@ -61,9 +61,9 @@ def close_db(connection: sqlite3.Connection):
 
 
 #  test execute many version if time before due date
-def top_250_to_db(cursor: sqlite3.Cursor, show_dict):
+def top_250_to_db(cursor: sqlite3.Cursor, show_dict, name):
     for entry in show_dict:
-        cursor.execute('''INSERT INTO TOP_250_TV_SHOWS (id, title, full_title, year, crew, imdb_rating,
+        cursor.execute(f'''INSERT INTO {name} (id, title, full_title, year, crew, imdb_rating,
                                     imdb_rating_count) VALUES (?,?,?,?,?,?,?);''',
                        (entry['id'], entry['title'], entry['fullTitle'],
                         entry['year'], entry['crew'], entry['imDbRating'], entry['imDbRatingCount']))
@@ -100,8 +100,8 @@ def user_ratings_to_db(cursor: sqlite3.Cursor, ratings_dict):
                                  entry['ratings'][9]['percent'], entry['ratings'][9]['votes']))
 
 
-def setup_db(cursor: sqlite3.Cursor):
-    cursor.execute('''CREATE TABLE IF NOT EXISTS top_250_tv_shows(
+def setup_top_250_tv_db(cursor: sqlite3.Cursor, name):
+    cursor.execute(f'''CREATE TABLE IF NOT EXISTS {name}(
     id TEXT PRIMARY KEY,
     title TEXT NOT NULL,
     full_title TEXT NOT NULL,
@@ -110,6 +110,9 @@ def setup_db(cursor: sqlite3.Cursor):
     imdb_rating REAL DEFAULT 0,
     imdb_rating_count INTEGER DEFAULT 0
     );''')
+
+
+def setup_user_ratings_db(cursor: sqlite3.Cursor):
     cursor.execute('''CREATE TABLE IF NOT EXISTS user_ratings(
     imdb_id TEXT PRIMARY KEY,
     total_rating INTEGER DEFAULT 0,
@@ -153,10 +156,10 @@ def main():
     report_results(top_show_data)
     conn, cur = open_db('output/imdb_db.sqlite')
     clear_db(cur)
-    setup_db(cur)
-    top_250_to_db(cur, top_show_data)
+    setup_top_250_tv_db(cur, 'top_250_tv_shows')
+    setup_user_ratings_db(cur)
+    top_250_to_db(cur, top_show_data, 'top_250_tv_shows')
     user_ratings_to_db(cur, ratings_data)
-    conn.commit()
     close_db(conn)
 
 
