@@ -69,6 +69,12 @@ def top_250_to_db(cursor: sqlite3.Cursor, show_dict, name):
                         entry['year'], entry['crew'], entry['imDbRating'], entry['imDbRatingCount']))
 
 
+def put_in_wheel_of_time(db_cursor: sqlite3.Cursor):
+    db_cursor.execute("""INSERT INTO top_250_tv_shows(id, title, full_title, year, crew, imdb_rating, imdb_rating_count)
+    VALUES('tt7462410','The Wheel of Time','The Wheel of Time (TV Series 2021– )',2021,'Rosamund Pike, Daniel Henney',
+    7.2,85286)""")
+
+
 #  filter that takes a list of values. used to avoid repeat code in user_ratings_to_db function.
 def user_ratings_filter(cursor: sqlite3.Cursor, val_list):
     cursor.execute('''INSERT INTO USER_RATINGS (imdb_id, total_rating, total_rating_votes, ten_rating_percent,
@@ -164,6 +170,7 @@ def main():
     setup_top_250_tv_db(cur, 'top_250_tv_shows')
     setup_user_ratings_db(cur)
     top_250_to_db(cur, top_show_data, 'top_250_tv_shows')
+    put_in_wheel_of_time(cur)
     user_ratings_to_db(cur, ratings_data)
     close_db(conn)
 
