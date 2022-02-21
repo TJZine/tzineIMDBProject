@@ -6,25 +6,26 @@ import imdbDBSprint3
 
 
 def test_top_250_tv():
-    result = imdbDBSprint3.get_top_250_tv_data()
+    query_data = imdbDBSprint3.get_movie_and_show_data()
+    result = query_data[0]
     assert len(result) == 250
 
 
-def dict_test() -> list[dict]:
-    show_test_dict = [{'id': 'tt0707077', 'rank': '2222', 'title': 'test_show_title',
-                       'fullTitle': 'full_show_title (2000)', 'year': '2000',
-                       'image': 'www.testURL.com', 'crew': 'actor 1, actor 2, actor 3',
-                       'imDbRating': 6.7, 'imDbRatingCount': 22222},
-                      {'id': 'tt2278757', 'rank': '2223', 'title': 'show_title_2',
-                       'fullTitle': 'full_show_title_2 (2011)', 'year': '2011',
-                       'image': 'www.testURL2.com', 'crew': 'actor 1, actor 2, actor 3',
-                       'imDbRating': 6.5, 'imDbRatingCount': 17052}]
-    return show_test_dict
+def top_250_dict_test() -> list[dict]:
+    top_250_test_dict = [{'id': 'tt0707077', 'rank': '2222', 'title': 'test_show_title',
+                          'fullTitle': 'full_show_title (2000)', 'year': '2000',
+                          'image': 'www.testURL.com', 'crew': 'actor 1, actor 2, actor 3',
+                          'imDbRating': 6.7, 'imDbRatingCount': 22222},
+                         {'id': 'tt2278757', 'rank': '2223', 'title': 'show_title_2',
+                          'fullTitle': 'full_show_title_2 (2011)', 'year': '2011',
+                          'image': 'www.testURL2.com', 'crew': 'actor 1, actor 2, actor 3',
+                          'imDbRating': 6.5, 'imDbRatingCount': 17052}]
+    return top_250_test_dict
 
 
 #  creates new database db_test and tests setup database and top_250_tv_db methods from imdbDB.py.
 def test_db():
-    entry = dict_test()
+    entry = top_250_dict_test()
     conn = sqlite3.connect('db_test.sqlite')
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()

@@ -5,52 +5,25 @@ import sqlite3
 from typing import Tuple
 
 
-def get_top_250_tv_data() -> list[dict]:
+def get_movie_and_show_data() -> list[list[dict]]:
     top_250_tv_query = f"https://imdb-api.com/en/API/Top250TVs/{secrets.secret_key}"
-    response = requests.get(top_250_tv_query)
-    if response.status_code != 200:  # if we don't get an ok response we have trouble
-        print(f"Failed to get data, response code:{response.status_code} and error message: {response.reason} ")
+    top_250_movie_query = f"https://imdb-api.com/en/API/Top250Movies/{secrets.secret_key}"
+    popular_tv_query = f"https://imdb-api.com/en/API/MostPopularTVs/{secrets.secret_key}"
+    popular_movie_query = f"https://imdb-api.com/en/API/MostPopularMovies/{secrets.secret_key}"
+    top_tv_response = requests.get(top_250_tv_query)
+    top_movie_response = requests.get(top_250_movie_query)
+    popular_tv_response = requests.get(popular_tv_query)
+    popular_movie_response = requests.get(popular_movie_query)
+    if top_tv_response.status_code != 200 or top_movie_response.status_code != 200 or \
+            popular_tv_response.status_code != 200 or popular_movie_response.status_code != 200:
+        print("Failed to get data")
         sys.exit(-1)
-    # json_response is a kinda useless dictionary, but the item's element has what we need
-    json_response = response.json()
-    show_list = json_response["items"]
-    return show_list
-
-
-def get_top_250_movie_data() -> list[dict]:
-    api_query = f"https://imdb-api.com/en/API/Top250Movies/{secrets.secret_key}"
-    response = requests.get(api_query)
-    if response.status_code != 200:  # if we don't get an ok response we have trouble
-        print(f"Failed to get data, response code:{response.status_code} and error message: {response.reason} ")
-        sys.exit(-1)
-    # json_response is a kinda useless dictionary, but the item's element has what we need
-    json_response = response.json()
-    show_list = json_response["items"]
-    return show_list
-
-
-def get_most_popular_tv_shows() -> list[dict]:
-    api_query = f"https://imdb-api.com/en/API/MostPopularTVs/{secrets.secret_key}"
-    response = requests.get(api_query)
-    if response.status_code != 200:  # if we don't get an ok response we have trouble
-        print(f"Failed to get data, response code:{response.status_code} and error message: {response.reason} ")
-        sys.exit(-1)
-    # json_response is a kinda useless dictionary, but the item's element has what we need
-    json_response = response.json()
-    show_list = json_response["items"]
-    return show_list
-
-
-def get_most_popular_movies() -> list[dict]:
-    api_query = f"https://imdb-api.com/en/API/MostPopularMovies/{secrets.secret_key}"
-    response = requests.get(api_query)
-    if response.status_code != 200:  # if we don't get an ok response we have trouble
-        print(f"Failed to get data, response code:{response.status_code} and error message: {response.reason} ")
-        sys.exit(-1)
-    # json_response is a kinda useless dictionary, but the item's element has what we need
-    json_response = response.json()
-    show_list = json_response["items"]
-    return show_list
+    top_tv_json = top_tv_response.json()
+    top_movie_json = top_movie_response.json()
+    popular_tv_json = popular_tv_response.json()
+    popular_movie_json = popular_movie_response.json()
+    query_data = [top_tv_json['items'], top_movie_json['items'], popular_tv_json['items'], popular_movie_json['items']]
+    return query_data
 
 
 def report_results(data_to_write: list[dict]):
@@ -105,6 +78,7 @@ def top_250_to_db(cursor: sqlite3.Cursor, show_dict, name):
                         entry['year'], entry['crew'], entry['imDbRating'], entry['imDbRatingCount']))
 
 
+#  writes the most popular shows/movies to the database.
 def most_popular_to_db(cursor: sqlite3.Cursor, show_dict, name):
     for entry in show_dict:
         cursor.execute(f'''INSERT INTO {name} (id, rank, rank_up_down, title, full_title, year, crew, imdb_rating,
@@ -115,22 +89,16 @@ def most_popular_to_db(cursor: sqlite3.Cursor, show_dict, name):
 
 #  make work for any column of the db entries using function input
 def find_min_max(ratings_dict) -> list[int]:
-    min_rating = 0
-    max1 = 0
-    max2 = 0
-    max3 = 0
+    rank_change_array = []
+    min_max_list = []
     for entry in ratings_dict:
         entry['rankUpDown'] = ''.join(c for c in entry['rankUpDown'] if (c.isnumeric() or c == '-'))
         entry['rankUpDown'] = int(entry['rankUpDown'])
-        if entry['rankUpDown'] < min_rating:
-            min_rating = entry['rankUpDown']
-        elif entry['rankUpDown'] > max1:
-            max1 = entry['rankUpDown']
-        elif entry['rankUpDown'] > max2:
-            max2 = entry['rankUpDown']
-        elif entry['rankUpDown'] > max3:
-            max3 = entry['rankUpDown']
-    min_max_list = [min_rating, max1, max2, max3]
+        rank_change_array.append(entry['rankUpDown'])
+    rank_change_array.sort(reverse=True)
+    min_max_list.append(rank_change_array[len(rank_change_array) - 1])
+    for i in range(3):
+        min_max_list.append(rank_change_array[i])
     return min_max_list
 
 
@@ -138,7 +106,7 @@ def min_max_to_db(cursor: sqlite3.Cursor, ratings_dict, min_max_list, name):
     for entry in ratings_dict:
         if (min_max_list[0] == entry['rankUpDown'] or min_max_list[1] == entry['rankUpDown']
                 or min_max_list[2] == entry['rankUpDown'] or min_max_list[3] == entry['rankUpDown']):
-            cursor.execute(f'''INSERT INTO {name} (id, rank, rank_up_down, title, full_title, year, crew, imdb_rating,
+            cursor.execute(f'''INSERT INTO {name} (ttid, rank, rank_up_down, title, full_title, year, crew, imdb_rating,
                                                 imdb_rating_count) VALUES (?,?,?,?,?,?,?,?,?);''',
                            (entry['id'], entry['rank'], entry['rankUpDown'], entry['title'], entry['fullTitle'],
                             entry['year'], entry['crew'], entry['imDbRating'], entry['imDbRatingCount']))
@@ -183,7 +151,7 @@ def user_ratings_to_db(cursor: sqlite3.Cursor, ratings_dict):
                                  entry['ratings'][9]['percent'], entry['ratings'][9]['votes']))
 
 
-#  creates the table in the database for the top 250 shows with the name specified.
+#  creates the tables in the database for the top 250 shows and movies with the name specified.
 def setup_top_250_db(cursor: sqlite3.Cursor, name):
     cursor.execute(f'''CREATE TABLE IF NOT EXISTS {name}(
     id TEXT PRIMARY KEY,
@@ -196,6 +164,7 @@ def setup_top_250_db(cursor: sqlite3.Cursor, name):
     );''')
 
 
+#  creates the tables in the database for the most popular shows and movies with the name specified.
 def setup_most_popular_db(cursor: sqlite3.Cursor, name):
     cursor.execute(f'''CREATE TABLE IF NOT EXISTS {name}(
     id TEXT PRIMARY KEY,
@@ -210,10 +179,29 @@ def setup_most_popular_db(cursor: sqlite3.Cursor, name):
     );''')
 
 
+#  creates table for top 3 positive changes in popularity and biggest negative change for most pop movies.
+def setup_min_max_db(cursor: sqlite3.Cursor, name):
+    cursor.execute(f'''CREATE TABLE IF NOT EXISTS {name}(
+    min_max_key INTEGER PRIMARY KEY,
+    ttid TEXT NOT NULL,
+    rank INTEGER DEFAULT 0,
+    rank_up_down INTEGER DEFAULT 0,
+    title TEXT NOT NULL,
+    full_title TEXT NOT NULL,
+    year TEXT NOT NULL,
+    crew TEXT NOT NULL,
+    imdb_rating REAL DEFAULT 0,
+    imdb_rating_count INTEGER DEFAULT 0,
+    FOREIGN KEY (ttid) REFERENCES most_popular_movies (id)
+    ON DELETE CASCADE ON UPDATE NO ACTION
+    );''')
+
+
 #  creates table in database for user ratings data.
 def setup_user_ratings_db(cursor: sqlite3.Cursor):
     cursor.execute('''CREATE TABLE IF NOT EXISTS user_ratings(
-    imdb_id TEXT PRIMARY KEY,
+    ratings_key INTEGER PRIMARY KEY,
+    imdb_id TEXT NOT NULL,
     total_rating INTEGER DEFAULT 0,
     total_rating_votes INTEGER DEFAULT 0,
     ten_rating_percent REAL DEFAULT 0,
@@ -254,12 +242,13 @@ def clear_db(cursor: sqlite3.Cursor):
 def main():
     erase_file = open("output/Output.txt", "w")  # erases any previous text in the file
     erase_file.close()
-
-    top_show_data = get_top_250_tv_data()
-    popular_show_data = get_most_popular_tv_shows()
-    top_movie_data = get_top_250_movie_data()
-    popular_movie_data = get_most_popular_movies()
-    ratings_data = get_ratings(top_show_data)
+    #  query data is a list of dictionaries for the queried data.
+    query_data = get_movie_and_show_data()
+    top_show_data = query_data[0]  # top 250 show data
+    top_movie_data = query_data[1]  # top 250 movie data
+    popular_show_data = query_data[2]  # most popular show data
+    popular_movie_data = query_data[3]  # most popular movie data
+    ratings_data = get_ratings(top_show_data)  # user ratings data for specified shows
     min_max_list = find_min_max(popular_movie_data)
 
     report_results(ratings_data)
@@ -275,7 +264,7 @@ def main():
     setup_top_250_db(cur, 'top_250_movies')
     setup_most_popular_db(cur, 'most_popular_movies')
     setup_user_ratings_db(cur)
-    setup_most_popular_db(cur, 'min_max_most_popular_movies')
+    setup_min_max_db(cur, 'min_max_most_popular_movies')
 
     top_250_to_db(cur, top_show_data, 'top_250_tv_shows')
     put_in_wheel_of_time(cur)
