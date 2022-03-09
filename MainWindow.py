@@ -5,7 +5,7 @@ import sqlite3
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QHBoxLayout, QTableWidget,\
-    QPushButton, QMessageBox, QVBoxLayout, QWidget
+    QPushButton, QMessageBox, QVBoxLayout, QWidget, QTableWidgetItem
 
 
 class ShowWindow(QTableWidget):
@@ -14,11 +14,21 @@ class ShowWindow(QTableWidget):
         loadUi("imdbDBTest.ui", self)
         self.setup_window()
         self.get_pop_tv_data()
+        self.data_window = None
 
     def setup_window(self):
         self.setWindowTitle("Most Popular TV Shows")
         self.setColumnWidth(0, 50)
+        self.resizeColumnToContents(0)
+        self.tableWidget.cellClicked.connect(self.check_top_ratings_data)
         self.show()
+
+    def check_top_ratings_data(self):
+        curr_row = self.tableWidget.currentRow()
+        curr_col = self.tableWidget.currentColumn()
+        print("Row %d and Column %d was clicked" % (curr_row, curr_col))
+        cell_val = self.tableWidget.item(curr_row, 0).text()
+        print(cell_val)
 
     def get_pop_tv_data(self):
         conn = sqlite3.connect('output/imdb_db.sqlite')
@@ -40,6 +50,12 @@ class ShowWindow(QTableWidget):
             self.tableWidget.setItem(row, 7, QtWidgets.QTableWidgetItem(str(data['imdb_rating'])))
             self.tableWidget.setItem(row, 8, QtWidgets.QTableWidgetItem(str(data['imdb_rating_count'])))
             row = row + 1
+
+    def check_top_ratings_data2(self, row, column):
+        print("Row %d and Column %d was clicked" % (row, column))
+        item = self.tableWidget.itemAt(row, column)
+        self.ID = item.text()
+        print(self.ID)
 
 
 class MovieWindow(QTableWidget):
