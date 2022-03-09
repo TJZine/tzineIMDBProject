@@ -125,30 +125,6 @@ def main():
     user_ratings_to_db(cur, ratings_data)
     min_max_to_db(cur, popular_movie_data, min_max_list, 'min_max_most_popular_movies')
 
-    cur.execute('SELECT * FROM MOST_POPULAR_TV_SHOWS')
-    most_popular_tv_data = cur.fetchall()
-    print(type(most_popular_tv_data))
-    for i in range(len(most_popular_tv_data)):
-        print(most_popular_tv_data[i][0], most_popular_tv_data[i][1], most_popular_tv_data[i][2],
-              most_popular_tv_data[i][3], most_popular_tv_data[i][4], most_popular_tv_data[i][5],
-              most_popular_tv_data[i][6], most_popular_tv_data[i][7], most_popular_tv_data[i][8])
-        print(type(most_popular_tv_data[i][1]))
-        print(type(most_popular_tv_data[i][2]))
-    close_db(conn)
-
-    print("ROW FACTORY:")
-
-    conn = sqlite3.connect('output/imdb_db.sqlite')
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM MOST_POPULAR_TV_SHOWS')
-    most_popular_tv_data = cur.fetchall()
-    for data in most_popular_tv_data:
-        print(data['id'], data['rank'], data['rank_up_down'], data['title'], data['full_title'], data['year'],
-              data['crew'], data['imdb_rating'], data['imdb_rating_count'])
-        print(type(data['rank']))
-        print(type(data['rank_up_down']))
-
 
 if __name__ == '__main__':
     main()

@@ -1,11 +1,11 @@
+import SortButtons
+import sortData
 import imdbDB
 import sqlite3
-import sys
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QHBoxLayout, QTableWidget,\
-    QPushButton, QMessageBox, QMainWindow, QVBoxLayout, QWidget
-import sortData
+    QPushButton, QMessageBox, QMainWindow, QVBoxLayout, QWidget, QDialog
 
 
 class ShowWindow(QTableWidget):
@@ -18,10 +18,6 @@ class ShowWindow(QTableWidget):
     def setup_window(self):
         self.setWindowTitle("Most Popular TV Shows")
         self.setColumnWidth(0, 50)
-        sort_by_rank_button = QPushButton("Sorted by: Rank", self)
-        sort_by_rank_button.clicked.connect(self.rank_shows_window)
-        sort_by_rank_up_down_button = QPushButton("Sorted by: RankUpDown", self)
-        sort_by_rank_up_down_button.clicked.connect(self.rank_up_down_window)
         self.show()
 
     def get_pop_tv_data(self):
@@ -44,14 +40,6 @@ class ShowWindow(QTableWidget):
             self.tableWidget.setItem(row, 7, QtWidgets.QTableWidgetItem(str(data['imdb_rating'])))
             self.tableWidget.setItem(row, 8, QtWidgets.QTableWidgetItem(str(data['imdb_rating_count'])))
             row = row + 1
-
-    def rank_shows_window(self):
-        self.w = sortData.RankShowWindow()
-        self.w.show()
-
-    def rank_up_down_window(self):
-        self.w = sortData.RankUpDownShowWindow()
-        self.w.show()
 
 
 class MovieWindow(QTableWidget):
@@ -125,8 +113,11 @@ class MainWindow(QWidget):
 
     def shows_window(self):
         self.w = ShowWindow()
+        self.sort = SortButtons.SortTVButtons()
         self.w.show()
+        self.sort.show()
 
     def movies_window(self):
         self.w = MovieWindow()
+        self.sort = SortButtons.SortMovieButtons()
         self.w.show()
