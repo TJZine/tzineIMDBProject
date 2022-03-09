@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>732</width>
+    <height>432</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QTableWidget" name="tableWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>731</width>
+     <height>441</height>
+    </rect>
+   </property>
+   <column>
+    <property name="text">
+     <string>id</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>rank</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>rankUpDown</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>title</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>fullTitle</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>year</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>crew</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>imDbRating</string>
+    </property>
+   </column>
+   <column>
+    <property name="text">
+     <string>imDbRatingCount</string>
+    </property>
+   </column>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

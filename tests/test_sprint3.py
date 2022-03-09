@@ -1,5 +1,6 @@
 import sqlite3
-import imdbDBSprint3
+import imdbDB
+import databaseSetup
 
 
 def popular_dict_test() -> list[dict]:
@@ -34,20 +35,20 @@ def popular_dict_test() -> list[dict]:
 
 def test_min_max():
     min_max = popular_dict_test()
-    min_max_list = imdbDBSprint3.find_min_max(min_max)
+    min_max_list = imdbDB.find_min_max(min_max)
     assert (min_max[4]['rankUpDown'] == min_max_list[0] and min_max[5]['rankUpDown'] == min_max_list[1]
             and min_max[1]['rankUpDown'] == min_max_list[2] and min_max[2]['rankUpDown'] == min_max_list[3])
 
 
 def test_most_popular_db():
     entry = popular_dict_test()
-    min_max_list = imdbDBSprint3.find_min_max(entry)
+    min_max_list = imdbDB.find_min_max(entry)
     conn = sqlite3.connect('most_popular_db_test.sqlite')
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     cur.execute('DROP TABLE IF EXISTS MOST_POPULAR_DB_TEST')
-    imdbDBSprint3.setup_most_popular_db(cur, 'most_popular_db_test')
-    imdbDBSprint3.most_popular_to_db(cur, entry, 'most_popular_db_test')
+    databaseSetup.setup_most_popular_db(cur, 'most_popular_db_test')
+    imdbDB.most_popular_to_db(cur, entry, 'most_popular_db_test')
     cur.execute("SELECT tbl_name FROM sqlite_master WHERE type ='table' AND name = 'most_popular_db_test'")
     table_name = cur.fetchone()
     assert table_name[0] == 'most_popular_db_test'
@@ -59,12 +60,9 @@ def test_most_popular_db():
             data['crew'] == entry[0]['crew'] and data['imdb_rating'] == entry[0]['imDbRating'] and
             data['imdb_rating_count'] == entry[0]['imDbRatingCount'])
     cur.execute('DROP TABLE IF EXISTS MIN_MAX_DB_TEST')
-    imdbDBSprint3.setup_min_max_db(cur, 'min_max_db_test')
-    imdbDBSprint3.min_max_to_db(cur, entry, min_max_list, 'min_max_db_test')
-    cur.execute("SELECT 'most_popular_db_test' AS constraint_table, pragma.'from' AS constraint_column, "
-                "pragma.'table' AS referenced_table, pragma.'to' AS referenced_column FROM pragma_foreign_key_list("
-                "'most_popular_db_test') AS pragma")
+    databaseSetup.setup_min_max_db(cur, 'min_max_db_test')
+    imdbDB.min_max_to_db(cur, entry, min_max_list, 'min_max_db_test')
     cur.execute("SELECT sql FROM sqlite_master WHERE name = 'min_max_db_test'")
     foreign_key = cur.fetchone()
     assert "FOREIGN KEY (ttid) REFERENCES most_popular_movies (id)" in foreign_key[0]
-    imdbDBSprint3.close_db(conn)
+    imdbDB.close_db(conn)

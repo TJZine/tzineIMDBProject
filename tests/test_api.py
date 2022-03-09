@@ -1,12 +1,12 @@
 import sqlite3
-import imdbDBSprint3
+import imdbDB
+import getAPIData
+import databaseSetup
 
 
 #  tests retrieval of top 250 tv shows data, tests length of the returned result is 250.
-
-
 def test_top_250_tv():
-    query_data = imdbDBSprint3.get_movie_and_show_data()
+    query_data = getAPIData.get_movie_and_show_data()
     result = query_data[0]
     assert len(result) == 250
 
@@ -30,11 +30,12 @@ def test_db():
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
     cur.execute('DROP TABLE IF EXISTS TEST_DB')
-    imdbDBSprint3.setup_top_250_db(cur, 'test_db')
-    imdbDBSprint3.top_250_to_db(cur, entry, 'test_db')
+    databaseSetup.setup_top_250_db(cur, 'test_db')
+    imdbDB.top_250_to_db(cur, entry, 'test_db')
     cur.execute('SELECT * FROM test_db')
     data = cur.fetchone()
-    imdbDBSprint3.close_db(conn)
+    print(type(data['id']))
+    imdbDB.close_db(conn)
     assert (data['id'] == entry[0]['id'] and data['title'] == entry[0]['title'] and
             data['full_title'] == entry[0]['fullTitle'] and data['year'] == entry[0]['year'] and
             data['crew'] == entry[0]['crew'] and data['imdb_rating'] == entry[0]['imDbRating'] and
