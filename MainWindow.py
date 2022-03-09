@@ -5,7 +5,7 @@ import sqlite3
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QHBoxLayout, QTableWidget,\
-    QPushButton, QMessageBox, QMainWindow, QVBoxLayout, QWidget, QDialog
+    QPushButton, QMessageBox, QVBoxLayout, QWidget
 
 
 class ShowWindow(QTableWidget):

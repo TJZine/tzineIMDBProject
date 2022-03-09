@@ -6,6 +6,7 @@ import sys
 def display_data():
     app = QApplication(sys.argv)
     my_window = MainWindow.MainWindow()
+    print(my_window)
     sys.exit(app.exec())
 
 
