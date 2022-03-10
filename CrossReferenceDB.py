@@ -5,11 +5,11 @@ from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QTableWidget
 
 
-def get_db_entry(ttid: str, db: str):
-    conn = sqlite3.connect('output/imdb_db.sqlite')
+def get_db_entry(ttid: str, table: str, db: str):
+    conn = sqlite3.connect(db)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute(f"SELECT * FROM {db}")
+    cur.execute(f"SELECT * FROM {table}")
     top_tv_data = cur.fetchall()
     imdbDB.close_db(conn)
     for data in top_tv_data:

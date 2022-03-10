@@ -26,7 +26,7 @@ class RankShowWindow(QTableWidget):
         print("Row %d and Column %d was clicked" % (curr_row, curr_col))
         cell_val = self.tableWidget.item(curr_row, 0).text()
         print(cell_val)
-        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_TV_SHOWS')
+        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_TV_SHOWS', 'output/imdb_db.sqlite')
         if full_entry is not None:
             self.data_window = EntryDetails.EntryDetails(cell_val)
             self.data_window.show()
@@ -72,7 +72,7 @@ class RankUpDownShowWindow(QTableWidget):
         print("Row %d and Column %d was clicked" % (curr_row, curr_col))
         cell_val = self.tableWidget.item(curr_row, 0).text()
         print(cell_val)
-        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_TV_SHOWS')
+        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_TV_SHOWS', 'output/imdb_db.sqlite')
         if full_entry is not None:
             self.data_window = EntryDetails.EntryDetails(cell_val)
             self.data_window.show()
@@ -119,7 +119,7 @@ class RankMovieWindow(QTableWidget):
         print("Row %d and Column %d was clicked" % (curr_row, curr_col))
         cell_val = self.tableWidget.item(curr_row, 0).text()
         print(cell_val)
-        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_MOVIES')
+        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_MOVIES', 'output/imdb_db.sqlite')
         if full_entry is not None:
             self.data_window = EntryDetails.MovieEntryDetails(cell_val)
             self.data_window.show()
@@ -165,7 +165,7 @@ class RankUpDownMovieWindow(QTableWidget):
         print("Row %d and Column %d was clicked" % (curr_row, curr_col))
         cell_val = self.tableWidget.item(curr_row, 0).text()
         print(cell_val)
-        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_MOVIES')
+        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_MOVIES', 'output/imdb_db.sqlite')
         if full_entry is not None:
             self.data_window = EntryDetails.MovieEntryDetails(cell_val)
             self.data_window.show()
