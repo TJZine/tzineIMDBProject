@@ -18,6 +18,8 @@ def close_db(connection: sqlite3.Connection):
 #  loop that writes the top 250 shows to the database specified.
 def top_250_to_db(cursor: sqlite3.Cursor, show_dict, name):
     for entry in show_dict:
+        print("top 250: ")
+        print(entry)
         cursor.execute(f'''INSERT INTO {name} (id, title, full_title, year, crew, imdb_rating,
                                     imdb_rating_count) VALUES (?,?,?,?,?,?,?);''',
                        (entry['id'], entry['title'], entry['fullTitle'],
@@ -27,6 +29,8 @@ def top_250_to_db(cursor: sqlite3.Cursor, show_dict, name):
 #  writes the most popular shows/movies to the database.
 def most_popular_to_db(cursor: sqlite3.Cursor, show_dict, name):
     for entry in show_dict:
+        print("most pop: ")
+        print(entry)
         cursor.execute(f'''INSERT INTO {name} (id, rank, rank_up_down, title, full_title, year, crew, imdb_rating,
                                     imdb_rating_count) VALUES (?,?,?,?,?,?,?,?,?);''',
                        (entry['id'], entry['rank'], entry['rankUpDown'], entry['title'], entry['fullTitle'],
@@ -124,6 +128,8 @@ def main():
     most_popular_to_db(cur, popular_movie_data, 'most_popular_movies')
     user_ratings_to_db(cur, ratings_data)
     min_max_to_db(cur, popular_movie_data, min_max_list, 'min_max_most_popular_movies')
+
+    close_db(conn)
 
 
 if __name__ == '__main__':

@@ -1,11 +1,13 @@
 import SortButtons
 import sortData
 import imdbDB
+import GraphWindow
+import EntryDetails
 import sqlite3
 from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QHBoxLayout, QTableWidget,\
-    QPushButton, QMessageBox, QVBoxLayout, QWidget, QTableWidgetItem
+from PyQt5.QtWidgets import QHBoxLayout, QTableWidget, \
+    QPushButton, QMessageBox, QVBoxLayout, QWidget
 
 
 class ShowWindow(QTableWidget):
@@ -29,6 +31,22 @@ class ShowWindow(QTableWidget):
         print("Row %d and Column %d was clicked" % (curr_row, curr_col))
         cell_val = self.tableWidget.item(curr_row, 0).text()
         print(cell_val)
+        full_entry = self.get_db_entry(cell_val)
+        print(full_entry)
+        if full_entry is not None:
+            self.data_window = EntryDetails.EntryDetails(cell_val)
+            self.data_window.show()
+
+    def get_db_entry(self, ttid: str):
+        conn = sqlite3.connect('output/imdb_db.sqlite')
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM TOP_250_TV_SHOWS')
+        top_tv_data = cur.fetchall()
+        imdbDB.close_db(conn)
+        for data in top_tv_data:
+            if data['id'] == ttid:
+                return data
 
     def get_pop_tv_data(self):
         conn = sqlite3.connect('output/imdb_db.sqlite')
@@ -51,12 +69,6 @@ class ShowWindow(QTableWidget):
             self.tableWidget.setItem(row, 8, QtWidgets.QTableWidgetItem(str(data['imdb_rating_count'])))
             row = row + 1
 
-    def check_top_ratings_data2(self, row, column):
-        print("Row %d and Column %d was clicked" % (row, column))
-        item = self.tableWidget.itemAt(row, column)
-        self.ID = item.text()
-        print(self.ID)
-
 
 class MovieWindow(QTableWidget):
     def __init__(self):
@@ -64,11 +76,36 @@ class MovieWindow(QTableWidget):
         loadUi("imdbDBTest.ui", self)
         self.setup_window()
         self.get_pop_movie_data()
+        self.data_window = None
 
     def setup_window(self):
         self.setWindowTitle("Most Popular Movies")
-        self.setColumnWidth(0, 50)
+        self.resizeColumnToContents(0)
+        self.tableWidget.cellClicked.connect(self.check_top_ratings_data)
         self.show()
+
+    def check_top_ratings_data(self):
+        curr_row = self.tableWidget.currentRow()
+        curr_col = self.tableWidget.currentColumn()
+        print("Row %d and Column %d was clicked" % (curr_row, curr_col))
+        cell_val = self.tableWidget.item(curr_row, 0).text()
+        print(cell_val)
+        full_entry = self.get_db_entry(cell_val)
+        print(full_entry)
+        if full_entry is not None:
+            self.data_window = EntryDetails.MovieEntryDetails(cell_val)
+            self.data_window.show()
+
+    def get_db_entry(self, ttid: str):
+        conn = sqlite3.connect('output/imdb_db.sqlite')
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+        cur.execute('SELECT * FROM TOP_250_MOVIES')
+        top_movie_data = cur.fetchall()
+        imdbDB.close_db(conn)
+        for data in top_movie_data:
+            if data['id'] == ttid:
+                return data
 
     def get_pop_movie_data(self):
         conn = sqlite3.connect('output/imdb_db.sqlite')
@@ -109,11 +146,14 @@ class MainWindow(QWidget):
         pop_tv_button.clicked.connect(self.shows_window)
         pop_movie_button = QPushButton("Most Popular Movies List", self)
         pop_movie_button.clicked.connect(self.movies_window)
+        graph_data_button = QPushButton("Analyze Data Points", self)
+        graph_data_button.clicked.connect(self.graph_window)
         layout = QHBoxLayout()
         layout.stretch(1)
         layout.addWidget(update_button)
         layout.addWidget(pop_tv_button)
         layout.addWidget(pop_movie_button)
+        layout.addWidget(graph_data_button)
         v_layout = QVBoxLayout()
         v_layout.stretch(1)
         v_layout.addLayout(layout)
@@ -136,4 +176,10 @@ class MainWindow(QWidget):
     def movies_window(self):
         self.w = MovieWindow()
         self.sort = SortButtons.SortMovieButtons()
+        self.w.show()
+
+    def graph_window(self):
+        self.w = GraphWindow.GraphWindow2()
+        self.graph2 = GraphWindow.GraphWindow()
+        self.graph2.show()
         self.w.show()
