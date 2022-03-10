@@ -4,18 +4,7 @@ from PyQt5.uic import loadUi
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QTableWidget
 import EntryDetails
-
-
-def get_db_entry(ttid: str):
-    conn = sqlite3.connect('output/imdb_db.sqlite')
-    conn.row_factory = sqlite3.Row
-    cur = conn.cursor()
-    cur.execute('SELECT * FROM TOP_250_TV_SHOWS')
-    top_tv_data = cur.fetchall()
-    imdbDB.close_db(conn)
-    for data in top_tv_data:
-        if data['id'] == ttid:
-            return data
+import CrossReferenceDB
 
 
 class RankShowWindow(QTableWidget):
@@ -37,8 +26,7 @@ class RankShowWindow(QTableWidget):
         print("Row %d and Column %d was clicked" % (curr_row, curr_col))
         cell_val = self.tableWidget.item(curr_row, 0).text()
         print(cell_val)
-        full_entry = get_db_entry(cell_val)
-        print(full_entry)
+        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_TV_SHOWS')
         if full_entry is not None:
             self.data_window = EntryDetails.EntryDetails(cell_val)
             self.data_window.show()
@@ -84,22 +72,11 @@ class RankUpDownShowWindow(QTableWidget):
         print("Row %d and Column %d was clicked" % (curr_row, curr_col))
         cell_val = self.tableWidget.item(curr_row, 0).text()
         print(cell_val)
-        full_entry = self.get_db_entry(cell_val)
-        print(full_entry)
+        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_TV_SHOWS')
         if full_entry is not None:
             self.data_window = EntryDetails.EntryDetails(cell_val)
             self.data_window.show()
 
-    def get_db_entry(self, ttid: str):
-        conn = sqlite3.connect('output/imdb_db.sqlite')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM TOP_250_TV_SHOWS')
-        top_tv_data = cur.fetchall()
-        imdbDB.close_db(conn)
-        for data in top_tv_data:
-            if data['id'] == ttid:
-                return data
 
     def get_rank_up_down_pop_tv_data(self):
         conn = sqlite3.connect('output/imdb_db.sqlite')
@@ -142,22 +119,10 @@ class RankMovieWindow(QTableWidget):
         print("Row %d and Column %d was clicked" % (curr_row, curr_col))
         cell_val = self.tableWidget.item(curr_row, 0).text()
         print(cell_val)
-        full_entry = self.get_db_entry(cell_val)
-        print(full_entry)
+        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_MOVIES')
         if full_entry is not None:
             self.data_window = EntryDetails.MovieEntryDetails(cell_val)
             self.data_window.show()
-
-    def get_db_entry(self, ttid: str):
-        conn = sqlite3.connect('output/imdb_db.sqlite')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM TOP_250_MOVIES')
-        top_movie_data = cur.fetchall()
-        imdbDB.close_db(conn)
-        for data in top_movie_data:
-            if data['id'] == ttid:
-                return data
 
     def get_sorted_pop_movie_data(self):
         conn = sqlite3.connect('output/imdb_db.sqlite')
@@ -200,22 +165,10 @@ class RankUpDownMovieWindow(QTableWidget):
         print("Row %d and Column %d was clicked" % (curr_row, curr_col))
         cell_val = self.tableWidget.item(curr_row, 0).text()
         print(cell_val)
-        full_entry = self.get_db_entry(cell_val)
-        print(full_entry)
+        full_entry = CrossReferenceDB.get_db_entry(cell_val, 'TOP_250_MOVIES')
         if full_entry is not None:
             self.data_window = EntryDetails.MovieEntryDetails(cell_val)
             self.data_window.show()
-
-    def get_db_entry(self, ttid: str):
-        conn = sqlite3.connect('output/imdb_db.sqlite')
-        conn.row_factory = sqlite3.Row
-        cur = conn.cursor()
-        cur.execute('SELECT * FROM TOP_250_MOVIES')
-        top_movie_data = cur.fetchall()
-        imdbDB.close_db(conn)
-        for data in top_movie_data:
-            if data['id'] == ttid:
-                return data
 
     def get_rank_up_down_pop_movie_data(self):
         conn = sqlite3.connect('output/imdb_db.sqlite')
