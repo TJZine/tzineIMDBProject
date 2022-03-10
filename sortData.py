@@ -77,7 +77,6 @@ class RankUpDownShowWindow(QTableWidget):
             self.data_window = EntryDetails.EntryDetails(cell_val)
             self.data_window.show()
 
-
     def get_rank_up_down_pop_tv_data(self):
         conn = sqlite3.connect('output/imdb_db.sqlite')
         conn.row_factory = sqlite3.Row

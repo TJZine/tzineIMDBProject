@@ -6,17 +6,9 @@ from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout
 import pyqtgraph as pg
 import sqlite3
 plt.use('Qt5Agg')
-shows_up = 0
-shows_down = 0
-movies_up = 0
-movies_down = 0
 
 
 def biggest_movers_loop(imdb_data) -> list[int]:
-    global shows_up
-    global shows_down
-    global movies_up
-    global movies_down
     rank_change_array = []
     for data in imdb_data:
         data_type = data['rank_up_down']
@@ -29,11 +21,7 @@ def biggest_movers_loop(imdb_data) -> list[int]:
     return rank_change_array
 
 
-def find_biggest_movers(table1, table2, db):
-    global shows_up
-    global shows_down
-    global movies_up
-    global movies_down
+def find_biggest_movers2(table1, table2, db) -> list[int]:
     shows_up = 0
     shows_down = 0
     movies_up = 0
@@ -57,7 +45,9 @@ def find_biggest_movers(table1, table2, db):
             movies_up = movies_up + 1
         elif entry < 0:
             movies_down = movies_down + 1
+    count_list = [shows_up, shows_down, movies_up, movies_down]
     imdbDB.close_db(conn)
+    return count_list
 
 
 class GraphWindow(QMainWindow):
@@ -69,14 +59,10 @@ class GraphWindow(QMainWindow):
         self.show()
 
     def setup_window(self):
-        global shows_up
-        global shows_down
-        global movies_up
-        global movies_down
-        find_biggest_movers('MOST_POPULAR_TV_SHOWS', 'MOST_POPULAR_MOVIES', 'output/imdb_db.sqlite')
+        count_list = find_biggest_movers2('MOST_POPULAR_TV_SHOWS', 'MOST_POPULAR_MOVIES', 'output/imdb_db.sqlite')
         widget = QWidget()
         plot = pg.plot()
-        y = [shows_down, shows_up, movies_down, movies_up]
+        y = [count_list[0], count_list[1], count_list[2], count_list[3]]
         x = [1, 2, 3, 4]
         bargraph = pg.BarGraphItem(x=x, height=y, width=.5, brush='g')
         plot.addItem(bargraph)
@@ -117,12 +103,8 @@ class Canvas(FigureCanvas):
         self.plot()
 
     def plot(self):
-        global shows_up
-        global shows_down
-        global movies_up
-        global movies_down
-        find_biggest_movers('MOST_POPULAR_TV_SHOWS', 'MOST_POPULAR_MOVIES', 'output/imdb_db.sqlite')
-        x = [shows_down, shows_up, movies_down, movies_up]
+        count_list = find_biggest_movers2('MOST_POPULAR_TV_SHOWS', 'MOST_POPULAR_MOVIES', 'output/imdb_db.sqlite')
+        x = [count_list[0], count_list[1], count_list[2], count_list[3]]
         labels = ['Popular shows down', 'Popular shows up', 'Popular movies down', 'Popular movies up']
         ax = self.figure.add_subplot(111)
         ax.pie(x, labels=labels, autopct=make_autopct(x))

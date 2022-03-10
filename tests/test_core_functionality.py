@@ -2,10 +2,29 @@ import sqlite3
 import CrossReferenceDB
 import imdbDB
 import databaseSetup
-shows_up = 0
-shows_down = 0
-movies_up = 0
-movies_down = 0
+import GraphWindow
+
+
+def popular_movie_dict_test() -> list[dict]:
+    popular_test_dict = [
+        {'id': 'tt0707077', 'rank': '2222', 'rankUpDown': '-21', 'title': 'test_show_title',
+         'fullTitle': 'full_show_title (2000)', 'year': '2000',
+         'image': 'www.testURL.com', 'crew': 'actor 1, actor 2, actor 3',
+         'imDbRating': 6.7, 'imDbRatingCount': 22222},
+        {'id': 'tt2278757', 'rank': '2223', 'rankUpDown': '74', 'title': 'show_title_2',
+         'fullTitle': 'full_show_title_2 (2011)', 'year': '2011',
+         'image': 'www.testURL2.com', 'crew': 'actor 1, actor 2, actor 3',
+         'imDbRating': 6.5, 'imDbRatingCount': 17052},
+        {'id': 'tt2274527', 'rank': '1001', 'rankUpDown': '0', 'title': 'show_title_3',
+         'fullTitle': 'full_show_title_3 (2012)', 'year': '2012',
+         'image': 'www.testURL3.com', 'crew': 'actor 1, actor 2, actor 3',
+         'imDbRating': 6.4, 'imDbRatingCount': 18073},
+        {'id': 'tt2379527', 'rank': '1001', 'rankUpDown': '1,214', 'title': 'show_title_3',
+         'fullTitle': 'full_show_title_3 (2012)', 'year': '2012',
+         'image': 'www.testURL3.com', 'crew': 'actor 1, actor 2, actor 3',
+         'imDbRating': 6.4, 'imDbRatingCount': 18073}
+    ]
+    return popular_test_dict
 
 
 def popular_dict_test() -> list[dict]:
@@ -106,6 +125,7 @@ def test_most_popular_db():
 def test_cross_ref():
     most_pop_dict = popular_dict_test()
     top_250_dict = top_250_dict_test()
+    most_pop_movie_dict = popular_movie_dict_test()
     conn = sqlite3.connect('cross_ref_db_test.sqlite')
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
@@ -115,6 +135,8 @@ def test_cross_ref():
     imdbDB.most_popular_to_db(cur, most_pop_dict, 'pop_cross_ref_db_test')
     databaseSetup.setup_top_250_db(cur, 'top_250_cross_ref_db_test')
     imdbDB.top_250_to_db(cur, top_250_dict, 'top_250_cross_ref_db_test')
+    databaseSetup.setup_most_popular_db(cur, 'pop_movie_cross_ref_db_test')
+    imdbDB.most_popular_to_db(cur, most_pop_movie_dict, 'pop_movie_cross_ref_db_test')
     imdbDB.close_db(conn)
     matches = CrossReferenceDB.cross_ref('pop_cross_ref_db_test', 'top_250_cross_ref_db_test', 'cross_ref_db_test'
                                                                                                '.sqlite')
@@ -125,11 +147,14 @@ def test_cross_ref():
 
 def test_get_db_entry():
     test = 'tt2415755'
-    conn = sqlite3.connect('cross_ref_db_test.sqlite')
-    conn.row_factory = sqlite3.Row
     entry = CrossReferenceDB.get_db_entry(test, 'pop_cross_ref_db_test', 'cross_ref_db_test.sqlite')
-    imdbDB.close_db(conn)
     assert entry['id'] == test
 
+
 def test_biggest_movers():
-    TEST=""
+    count_list = GraphWindow.find_biggest_movers2('pop_cross_ref_db_test', 'pop_movie_cross_ref_db_test',
+                                                  'cross_ref_db_test.sqlite')
+    assert count_list[0] == 5
+    assert count_list[1] == 1
+    assert count_list[2] == 2
+    assert count_list[3] == 1
