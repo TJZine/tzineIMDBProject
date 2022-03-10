@@ -2,14 +2,32 @@ import imdbDB
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib as plt
-from PyQt5.QtWidgets import *
+from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout
 import pyqtgraph as pg
 import sqlite3
+
 plt.use('Qt5Agg')
 shows_up = 0
 shows_down = 0
 movies_up = 0
 movies_down = 0
+
+
+def biggest_movers_loop(imdb_data) -> list[int]:
+    global shows_up
+    global shows_down
+    global movies_up
+    global movies_down
+    rank_change_array = []
+    for data in imdb_data:
+        data_type = data['rank_up_down']
+        if isinstance(data_type, str):
+            mod_data = ''.join(c for c in data['rank_up_down'] if (c.isnumeric() or c == '-'))
+            mod_data = int(mod_data)
+            rank_change_array.append(mod_data)
+        else:
+            rank_change_array.append(data['rank_up_down'])
+    return rank_change_array
 
 
 def find_biggest_movers():
@@ -26,32 +44,16 @@ def find_biggest_movers():
     cur = conn.cursor()
     cur.execute('SELECT * FROM MOST_POPULAR_TV_SHOWS')
     top_tv_data = cur.fetchall()
-    tv_rank_change_array = []
-    for data in top_tv_data:
-        data_type = data['rank_up_down']
-        if isinstance(data_type, str):
-            mod_data = ''.join(c for c in data['rank_up_down'] if (c.isnumeric() or c == '-'))
-            mod_data = int(mod_data)
-            tv_rank_change_array.append(mod_data)
-        else:
-            tv_rank_change_array.append(data['rank_up_down'])
-    for entry in tv_rank_change_array:
+    tv_change_count = biggest_movers_loop(top_tv_data)
+    for entry in tv_change_count:
         if entry > 0:
             shows_up = shows_up + 1
         elif entry < 0:
             shows_down = shows_down + 1
     cur.execute('SELECT * FROM MOST_POPULAR_MOVIES')
     top_movie_data = cur.fetchall()
-    movie_rank_change_array = []
-    for data in top_movie_data:
-        data_type = data['rank_up_down']
-        if isinstance(data_type, str):
-            mod_data = ''.join(c for c in data['rank_up_down'] if (c.isnumeric() or c == '-'))
-            mod_data = int(mod_data)
-            movie_rank_change_array.append(mod_data)
-        else:
-            movie_rank_change_array.append(data['rank_up_down'])
-    for entry in movie_rank_change_array:
+    movie_change_count = biggest_movers_loop(top_movie_data)
+    for entry in movie_change_count:
         if entry > 0:
             movies_up = movies_up + 1
         elif entry < 0:
