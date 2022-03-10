@@ -17,13 +17,13 @@ def get_db_entry(ttid: str, db: str):
             return data
 
 
-def cross_ref(db1, db2) -> list:
-    conn = sqlite3.connect('output/imdb_db.sqlite')
+def cross_ref(table1, table2, db_name) -> list:
+    conn = sqlite3.connect(db_name)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute(f"SELECT * FROM {db1}")
+    cur.execute(f"SELECT * FROM {table1}")
     most_popular_data = cur.fetchall()
-    cur.execute(f"SELECT * FROM {db2}")
+    cur.execute(f"SELECT * FROM {table2}")
     top_data = cur.fetchall()
     imdbDB.close_db(conn)
     ref_entry = []
@@ -47,7 +47,7 @@ class CrossRefShowWindow(QTableWidget):
         self.show()
 
     def insert_data(self):
-        shows = cross_ref('MOST_POPULAR_TV_SHOWS', 'TOP_250_TV_SHOWS')
+        shows = cross_ref('MOST_POPULAR_TV_SHOWS', 'TOP_250_TV_SHOWS', 'output/imdb_db.sqlite')
         self.tableWidget.setRowCount(len(shows))
         row = 0
         for data in shows:
@@ -74,7 +74,7 @@ class CrossRefMovieWindow(QTableWidget):
         self.show()
 
     def insert_data(self):
-        movies = cross_ref('MOST_POPULAR_MOVIES', 'TOP_250_MOVIES')
+        movies = cross_ref('MOST_POPULAR_MOVIES', 'TOP_250_MOVIES', 'output/imdb_db.sqlite')
         self.tableWidget.setRowCount(len(movies))
         row = 0
         for data in movies:
