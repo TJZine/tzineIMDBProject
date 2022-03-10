@@ -5,7 +5,6 @@ import matplotlib as plt
 from PyQt5.QtWidgets import QMainWindow, QWidget, QGridLayout
 import pyqtgraph as pg
 import sqlite3
-
 plt.use('Qt5Agg')
 shows_up = 0
 shows_down = 0
@@ -79,9 +78,6 @@ class GraphWindow(QMainWindow):
         plot = pg.plot()
         y = [shows_down, shows_up, movies_down, movies_up]
         x = [1, 2, 3, 4]
-        x1 = {'Popular shows down': 1, 'Popular shows up': 2, 'Popular movies down': 3, 'Popular movies up': 4}
-        string_axis = pg.AxisItem(orientation='bottom')
-        string_axis.setTicks([x1.items()])
         bargraph = pg.BarGraphItem(x=x, height=y, width=.5, brush='g')
         plot.addItem(bargraph)
         layout = QGridLayout()
