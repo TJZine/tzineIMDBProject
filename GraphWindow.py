@@ -29,7 +29,7 @@ def biggest_movers_loop(imdb_data) -> list[int]:
     return rank_change_array
 
 
-def find_biggest_movers():
+def find_biggest_movers(table1, table2, db):
     global shows_up
     global shows_down
     global movies_up
@@ -38,10 +38,10 @@ def find_biggest_movers():
     shows_down = 0
     movies_up = 0
     movies_down = 0
-    conn = sqlite3.connect('output/imdb_db.sqlite')
+    conn = sqlite3.connect(db)
     conn.row_factory = sqlite3.Row
     cur = conn.cursor()
-    cur.execute('SELECT * FROM MOST_POPULAR_TV_SHOWS')
+    cur.execute(f"SELECT * FROM {table1}")
     top_tv_data = cur.fetchall()
     tv_change_count = biggest_movers_loop(top_tv_data)
     for entry in tv_change_count:
@@ -49,7 +49,7 @@ def find_biggest_movers():
             shows_up = shows_up + 1
         elif entry < 0:
             shows_down = shows_down + 1
-    cur.execute('SELECT * FROM MOST_POPULAR_MOVIES')
+    cur.execute(f"SELECT * FROM {table2}")
     top_movie_data = cur.fetchall()
     movie_change_count = biggest_movers_loop(top_movie_data)
     for entry in movie_change_count:
@@ -73,7 +73,7 @@ class GraphWindow(QMainWindow):
         global shows_down
         global movies_up
         global movies_down
-        find_biggest_movers()
+        find_biggest_movers('MOST_POPULAR_TV_SHOWS', 'MOST_POPULAR_MOVIES', 'output/imdb_db.sqlite')
         widget = QWidget()
         plot = pg.plot()
         y = [shows_down, shows_up, movies_down, movies_up]
@@ -121,7 +121,7 @@ class Canvas(FigureCanvas):
         global shows_down
         global movies_up
         global movies_down
-        find_biggest_movers()
+        find_biggest_movers('MOST_POPULAR_TV_SHOWS', 'MOST_POPULAR_MOVIES', 'output/imdb_db.sqlite')
         x = [shows_down, shows_up, movies_down, movies_up]
         labels = ['Popular shows down', 'Popular shows up', 'Popular movies down', 'Popular movies up']
         ax = self.figure.add_subplot(111)

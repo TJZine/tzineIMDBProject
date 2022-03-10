@@ -1,8 +1,11 @@
 import sqlite3
-
 import CrossReferenceDB
 import imdbDB
 import databaseSetup
+shows_up = 0
+shows_down = 0
+movies_up = 0
+movies_down = 0
 
 
 def popular_dict_test() -> list[dict]:
@@ -128,4 +131,5 @@ def test_get_db_entry():
     imdbDB.close_db(conn)
     assert entry['id'] == test
 
-
+def test_biggest_movers():
+    TEST=""
