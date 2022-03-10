@@ -1,11 +1,11 @@
+import imdbDB
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib as plt
 from PyQt5.QtWidgets import *
-import sys
 import pyqtgraph as pg
 import sqlite3
-import imdbDB
-from PyQt5.QtChart import QChart, QChartView, QValueAxis, QBarCategoryAxis, QBarSet, QBarSeries
-from PyQt5.Qt import Qt
-from PyQt5.QtGui import QPainter
+plt.use('Qt5Agg')
 shows_up = 0
 shows_down = 0
 movies_up = 0
@@ -59,55 +59,6 @@ def find_biggest_movers():
     imdbDB.close_db(conn)
 
 
-class GraphWindow2(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("Movers Graph")
-        self.setGeometry(100, 100, 800, 700)
-        self.setup_window()
-        self.show()
-
-    def setup_window(self):
-        global shows_up
-        global shows_down
-        global movies_up
-        global movies_down
-        find_biggest_movers()
-        set0 = QBarSet('Pop shows Moving down')
-        set1 = QBarSet('Pop shows moving up')
-        set2 = QBarSet('Pop movies moving up')
-        set3 = QBarSet('Pop movies moving down')
-        set0.append(shows_down)
-        set1.append(shows_up)
-        set2.append(movies_down)
-        set3.append(movies_up)
-        changes_series = QBarSeries()
-        changes_series.append(set0)
-        changes_series.append(set1)
-        changes_series.append(set2)
-        changes_series.append(set3)
-
-        movers_chart = QChart()
-        movers_chart.addSeries(changes_series)
-        movers_chart.setTitle("Number of Movers in Most Popular Data")
-        movers_chart.setAnimationOptions(QChart.SeriesAnimations)
-
-        labels = [str(shows_down), str(shows_up), str(movies_down), str(movies_up)]
-        print(labels)
-        axis_x = QBarCategoryAxis()
-        axis_x.setRange(labels[0], labels[3])
-        axis_x.append(labels)
-        axis_y = QValueAxis()
-        axis_y.setRange(0, 60)
-
-        movers_chart.addAxis(axis_x, Qt.AlignBottom)
-        movers_chart.addAxis(axis_y, Qt.AlignLeft)
-        movers_chart.legend().setVisible(True)
-        movers_chart.legend().setAlignment(Qt.AlignBottom)
-        movers_chart_view = QChartView(movers_chart)
-        self.setCentralWidget(movers_chart_view)
-
-
 class GraphWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -126,9 +77,54 @@ class GraphWindow(QMainWindow):
         plot = pg.plot()
         y = [shows_down, shows_up, movies_down, movies_up]
         x = [1, 2, 3, 4]
+        x1 = {'Popular shows down': 1, 'Popular shows up': 2, 'Popular movies down': 3, 'Popular movies up': 4}
+        string_axis = pg.AxisItem(orientation='bottom')
+        string_axis.setTicks([x1.items()])
         bargraph = pg.BarGraphItem(x=x, height=y, width=.5, brush='g')
         plot.addItem(bargraph)
         layout = QGridLayout()
         widget.setLayout(layout)
         layout.addWidget(plot)
         self.setCentralWidget(widget)
+
+
+class PieChartWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        title = "Count of Movies/Shows moving up and down in Popularity"
+        self.setWindowTitle(title)
+        self.setGeometry(400, 400, 700, 400)
+        self.setup_window()
+
+    def setup_window(self):
+        canvas = Canvas(self, width=8, height=4)
+        canvas.move(0, 0)
+
+
+def make_autopct(x):
+    def my_autopct(pct):
+        total = sum(x)
+        val = int(round(pct * total / 100.0))
+        return '{p:.2f}%  ({v:d})'.format(p=pct, v=val)
+
+    return my_autopct
+
+
+class Canvas(FigureCanvas):
+    def __init__(self, parent=None, width=5, height=5, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        FigureCanvas.__init__(self, fig)
+        self.setParent(parent)
+        self.plot()
+
+    def plot(self):
+        global shows_up
+        global shows_down
+        global movies_up
+        global movies_down
+        find_biggest_movers()
+        x = [shows_down, shows_up, movies_down, movies_up]
+        labels = ['Popular shows down', 'Popular shows up', 'Popular movies down', 'Popular movies up']
+        ax = self.figure.add_subplot(111)
+        ax.pie(x, labels=labels, autopct=make_autopct(x))

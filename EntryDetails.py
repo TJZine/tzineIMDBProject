@@ -17,7 +17,6 @@ class EntryDetails(QWidget):
         cur.execute('SELECT * FROM TOP_250_TV_SHOWS')
         top_tv_data = cur.fetchall()
         imdbDB.close_db(conn)
-        print(self.data)
         curr_entry = None
         for data in top_tv_data:
             if data['id'] == self.data:
@@ -69,7 +68,6 @@ class MovieEntryDetails(QWidget):
         cur.execute('SELECT * FROM TOP_250_MOVIES')
         top_movie_data = cur.fetchall()
         imdbDB.close_db(conn)
-        print(self.data)
         curr_entry = None
         for data in top_movie_data:
             if data['id'] == self.data:

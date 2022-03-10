@@ -179,7 +179,7 @@ class MainWindow(QWidget):
         self.w.show()
 
     def graph_window(self):
-        self.w = GraphWindow.GraphWindow2()
-        self.graph2 = GraphWindow.GraphWindow()
+        self.graph = GraphWindow.GraphWindow()
+        self.graph2 = GraphWindow.PieChartWindow()
+        self.graph.show()
         self.graph2.show()
-        self.w.show()
