@@ -127,6 +127,8 @@ def main():
 
     close_db(conn)
 
+    print("Database Updated.")
+
 
 if __name__ == '__main__':
     main()

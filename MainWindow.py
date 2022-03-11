@@ -21,8 +21,18 @@ class ShowWindow(QTableWidget):
 
     def setup_window(self):
         self.setWindowTitle("Most Popular TV Shows")
+        self.setGeometry(800, 400, 750, 450)
         self.setColumnWidth(0, 50)
+        self.setSizeAdjustPolicy(QtWidgets.QAbstractScrollArea.AdjustToContents)
         self.resizeColumnToContents(0)
+        self.resizeColumnToContents(1)
+        self.resizeColumnToContents(2)
+        self.resizeColumnToContents(3)
+        self.resizeColumnToContents(4)
+        self.resizeColumnToContents(5)
+        self.resizeColumnToContents(6)
+        self.resizeColumnToContents(7)
+        self.resizeColumnToContents(8)
         self.tableWidget.cellClicked.connect(self.check_top_ratings_data)
         self.show()
 
@@ -117,6 +127,7 @@ class MainWindow(QWidget):
 
     def setup_window(self):
         self.setWindowTitle("Home Page")
+        self.setGeometry(50, 50, 200, 100)
         update_button = QPushButton("Update Now", self)
         update_button.clicked.connect(self.update_data)
         pop_tv_button = QPushButton("Most Popular TV Shows List", self)

@@ -59,7 +59,7 @@ def popular_dict_test() -> list[dict]:
 
 def top_250_dict_test() -> list[dict]:
     top_250_dict = [
-        {'id': 'tt0537377',  'title': 'test_show_title3',
+        {'id': 'tt0537377', 'title': 'test_show_title3',
          'fullTitle': 'full_show_title (2000)', 'year': '2000',
          'image': 'www.testURL.com', 'crew': 'actor 1, actor 2, actor 3',
          'imDbRating': 6.7, 'imDbRatingCount': 22222},
@@ -145,7 +145,7 @@ def test_cross_ref():
     assert matches[1]['id'] == 'tt2356557'
 
 
-def test_get_db_entry():
+def test_get_db_entry():  # tests crossover functionality
     test = 'tt2415755'
     entry = CrossReferenceDB.get_db_entry(test, 'pop_cross_ref_db_test', 'cross_ref_db_test.sqlite')
     assert entry['id'] == test
